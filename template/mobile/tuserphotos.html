@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	<title>{$title_name}校园之星</title>
+	<meta name="format-detection" content="telephone=no, address=no">
+	<meta name="apple-mobile-web-app-capable" content="yes" /> <!-- apple devices fullscreen -->
+	<meta name="apple-touch-fullscreen" content="yes"/>
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+	<meta name="keywords" content="{if empty($_W['page']['keywords'])}{if IMS_FAMILY != 'x'}幻月科技,微信,微信公众平台,fmoons.com{/if}{else}{$_W['page']['keywords']}{/if}" />
+	<meta name="description" content="{if empty($_W['page']['description'])}{if IMS_FAMILY != 'x'}公众平台自助引擎（www.fmoons.com），简称幻月科技，幻月科技是一款免费开源的微信公众平台管理系统，是国内最完善移动网站及移动互联网技术解决方案。{/if}{else}{$_W['page']['description']}{/if}" />
+	<link rel="shortcut icon" href="{$_W['siteroot']}{$_W['config']['upload']['attachdir']}/{if !empty($_W['setting']['copyright']['icon'])}{$_W['setting']['copyright']['icon']}{else}images/global/wechat.jpg{/if}" />
+	<link href="{$_W['siteroot']}app/resource/css/bootstrap.min.css" rel="stylesheet">
+	<link href="{FM_STATIC_MOBILE}public/photos/main.css?v1" rel="stylesheet">
+	<link type="text/css" rel="stylesheet" href="{FM_STATIC_MOBILE}public/photos/dialog1.css">
+	<link type="text/css" rel="stylesheet" href="{FM_STATIC_MOBILE}public/photos/style.css">
+	<link type="text/css" rel="stylesheet" href="{FM_STATIC_MOBILE}public/photos/gz_tip.css">
+	{php echo register_jssdk(false)}
+	<script type="text/javascript" src="{$_W['siteroot']}app/resource/js/lib/jquery-1.11.1.min.js"></script>
+	<script src="http://cdn.bootcss.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="{FM_STATIC_MOBILE}public/photos/js/Tip.js"></script>
+	<script type="text/javascript" src="{FM_STATIC_MOBILE}public/photos/js/dialog_min1.js"></script>
+	<script type="text/javascript">
+		var config = {
+		    coverUrl:'', //canvas图片 如果是挂卡图片形式就有图片地址   如果是其他形式则没有图片地址
+		    swipeCur: 0,
+		    swipeDir:'horizontal', //滑动图片方向  上下滑动 vertical   左右滑动 horizontal
+		}
+		//业务关联链接数组
+		var ary_biz_jump_id = new Array();
+		var ary_biz_jump_url = new Array();
+		function _removeHTMLTag(str) {
+			if(typeof str == 'string'){
+				str = str.replace(/<script[^>]*?>[\s\S]*?<\/script>/g,'');
+				str = str.replace(/<style[^>]*?>[\s\S]*?<\/style>/g,'');
+				str = str.replace(/<\/?[^>]*>/g,'');
+				str = str.replace(/\s+/g,'');
+				str = str.replace(/&nbsp;/ig,'');
+			}
+			return str;
+		}
+	</script>
+	<script src="{FM_STATIC_MOBILE}public/photos/js/zepto_min.js"></script>
+	<script src="{FM_STATIC_MOBILE}public/photos/js/lottery.js"></script>
+	<script src="{FM_STATIC_MOBILE}public/photos/js/swipe.js"></script>
+	<script src="{FM_STATIC_MOBILE}public/photos/js/player.js"></script>
+	<script src="{FM_STATIC_MOBILE}public/photos/js/stackBlur.js"></script>
+	<script src="{FM_STATIC_MOBILE}public/photos/js/app.js"></script>
+	<style>
+	body{background:#000 no-repeat;  max-width: 640px;  margin: 0 auto;}
+	.container {
+		padding-right: 0;
+		padding-left: 0;
+		margin-right: auto;
+		margin-left: auto;
+	}
+	.pic_img{
+		width: 60px;
+		height: 60px;
+		border-radius: 60px;
+		border: 5px solid rgba(200,200,200,1);
+	}
+	.zongshu {
+		padding-left: 9vw;
+		padding-top: 3.5vw;
+		background: rgba(34, 34, 35, 0.7);
+		height: 56.5px;
+		color: {if empty($bgarr['bodytextcolor'])}#fff{else}{$bgarr['bodytextcolor']}{/if};
+		font-size: 0.8em;
+		width:87%;
+	}
+	.zongshu span{
+		color: {if empty($bgarr['bodynumcolor'])}#fff{else}{$bgarr['bodynumcolor']}{/if};
+	}
+	.lapiao .l {
+		color: {if empty($bgarr['bodytextcolor'])}#fff{else}{$bgarr['bodytextcolor']}{/if};
+	}
+	.lapiao .r {
+		color: {if empty($bgarr['bodytextcolor'])}#fff{else}{$bgarr['bodytextcolor']}{/if};
+	}
+	.lapiao {
+		height: 75px;
+		padding: 2vw;
+		/* background: rgba(0,0,0,0.5); */
+		position: fixed;
+		bottom: 9px;
+		z-index: 10000;
+		max-width: 640px;
+		margin: 0 auto;
+		background-color: #F0F0F0;
+		width: 96%;
+		left: 2%;
+		border-radius: 1vw;
+	}
+	.int {
+		padding: 10px 5px;
+		width: 100%;
+		background: rgba(0,0,0,0.5);
+		position: fixed;
+		bottom: 0px;
+		z-index: 1000;
+		display: none;
+		max-width: 640px;
+		margin: 0 auto;
+	}
+	.lyan input,.ly_pl input{
+		background-color: rgba(34,34,35,0.5);
+		padding: 1vw 2vw
+	}
+	.ly_pl{
+		margin-top: 2vw
+	}
+
+	input::-webkit-input-placeholder {
+		/* placeholder颜色  */
+		color: rgba(200,200,200,1); !important;
+
+	}
+	.ly_info{
+		position: fixed;
+		bottom: 0vw;
+		z-index: 100000;
+		background: white;
+		width: 100%;
+		display: none;
+		line-height: 8.5vw;
+		padding-bottom: 3vw;
+	}
+	.ly_info img{
+		width: 72px;
+		height: 72px;
+		border-radius: 100%;
+		position: absolute;
+		top: -11vw;
+		left: 39%;
+	}
+	.ly_school{
+		text-align: center;
+		margin-top: 10vw;
+		font-size: 1.2em;
+	}
+	.ly_info .row{
+		font-size: 1em;
+	}
+	.ly_info .ly span{
+		padding-left: 12vw
+	}
+	.lyy{
+		padding-left: 15vw
+	}
+	.lyy span{
+		font-size: 1em
+	}
+	.ly_lwlist{
+		position: fixed;
+		bottom: 0vw;
+		z-index: 100000;
+		background: rgb(34,35,35);
+		width: 100%;
+		display: none;
+		padding-bottom: 4vw;
+	}
+	.ly_lww{
+		border: solid white 0.1px;
+		height: 21vw;
+		text-align: center;
+		position: relative;
+	}
+	.ly_lw_dis{
+		margin: 3vw;
+	}
+</style>
+<script type="text/javascript" src="{FM_STATIC_MOBILE}public/photos/js/main.js?v=1.0"></script>
+</head>
+<body>
+	<div class="container container-fill">
+
+		<div class="container">
+			<div class="loading-img">
+				<div id="circular">
+					{loop $picarrs $mid $row}
+					<div id="circular_{$mid}" class="circular"></div>
+					{/loop}
+					<div class="clearfix"></div>
+				</div>
+			</div>
+			<div class="swipe" id="swipe">
+				<div class="pic_img" id="display_info"><img src="{php echo $this->getheadimg($tfrom_user,$rid)}" /></div>
+				<div class="zongshu"> {if empty($user['realname'])}未填{else}{php echo cutstr($user['realname'], '6')}{/if} <span style="padding-left: 0.5em">{$user['age']}岁</span><span style="padding-left: 0.5em">{if !empty($user['stature'])}{$user['stature']}cm{/if}</span><span style="float:right;">名次：{php echo $this->GetPaihangchaa($rid,$tfrom_user)['rank']}</span>
+					<br><span>{$user['school']}</span><span style="padding-left: 0.5em">{$user['constellation']}</span><span style="float:right;">票数：{php echo $user['photosnum'] + $user['xnphotosnum']} </span>
+				</div>
+				<ul>
+					{loop $picarrs $mid $row}
+					<li class="tt" {if !empty($_GPC['ti']) && $mid == $_GPC['ti']}class="cur"{/if}><div style="background-image: url({php echo toimage($row['photos'])})"></div></li>
+					{/loop}
+				</ul>
+			</div>
+			<div id="arrowV" class="arrow_v f-hide"><p></p></div>
+			<div id="arrowH" class="arrow_h f-hide">
+				<span class="arrow_l"></span>
+				<span class="arrow_r"></span>
+			</div>
+			<div class="lottery" id="lottery"></div>
+			<div class="download_mask" id="downloadMask"><i></i></div>
+		</div>
+
+		<img src="{FM_STATIC_MOBILE}public/images/qp.png" id="all_display" style=" position: fixed; width: 8vw;right: 5vw;bottom: 13vw;
+		z-index: 99999;" alt="">
+		<div class="lapiao" id="ly_bottom">
+			<div class="row lyan">
+				<div class="col-xs-8 col-sm-8" style="position: relative;left: 2vw">
+					<form action="">
+						<input id="comment" type="text" style="width: 100%;margin-left: -1vw;border-radius: 1vw;color: rgba(200,200,200,1);" placeholder="给Ta留言~"> 
+					</form>
+				</div>
+				<div class="col-xs-2 col-sm-2" id="submit_comment">
+					<input type="text" style="width: 12vw;border-radius: 1vw;color: rgba(200,200,200,1);" disabled="disabled" value="评论">
+				</div>
+			</div>
+			<div class="ly_pl row">
+				<div class="col-xs-2 col-sm-2" id="back_vote"><img style="width: 27px;margin-top: 0.05em;margin-left: 1vw" src="{FM_STATIC_MOBILE}public/images/back2.png" alt=""></div>
+				<div class="col-xs-4 col-sm-4"><a href="{php echo $this->createMobileUrl('user_vedio',array('rid'=>$rid,'tfrom_user'=>$tfrom_user))}"><input type="button" value="视频" style="color: white;background-color: #FFB800;border-radius: 1vw;width: 20vw;" /></a></div>
+				<div class="col-xs-3 col-sm-3" id="ly_lw"><input type="button" value="礼物" style="color: white;background-color: #FF5722;border-radius: 1vw;width: 20vw;" /></div>
+				<div class="col-xs-3 col-sm-3"><a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" onclick="tvote()"><input type="button" value="投票" style="color: white;background-color: #01AAED;width: 20vw;border-radius: 1vw;float: right;" /></a></div>
+			</div>
+		</div>
+		<script>
+			$('#submit_comment').on('click', function(e){
+				var val = $('#comment').val()
+				if(!val){
+					alert('请输入评论内容')
+					return false
+				}
+				var arrMg = "{$comment}".split('.')
+
+				for (var i = 0; i < arrMg.length; i++) {
+
+					var r = new RegExp(arrMg[i], "ig");
+					val = val.replace(r, "***");
+				}
+				$.post("{php echo $this->createMobileUrl('tuserphotos',array('tfrom_user'=>$tfrom_user,'rid'=>$rid))}", {comment: val}, function(data, textStatus, xhr) {
+					console.log(data)
+					if(data){
+						alert('评论成功')
+						location.reload();
+					}
+					else
+						alert('评论失败')
+				});
+
+				return false
+			});
+			$('#back_vote').on('click',function(){
+				if("{$is_has_area}" != '0')
+					window.location.href = "{php echo $this->createMobileUrl('photosvote',array('rid'=>$rid))}"
+				else
+					window.location.href = "{php echo $this->createMobileUrl('ly_area',array('rid'=>$rid))}"
+			})
+		</script>
+		<div class="ly_info"> 
+			<img style="border: 4px solid rgba(200,200,200,1);" src="{php echo $this->getheadimg($tfrom_user,$rid)}" />
+			<div>
+				<div id="info_hide" style="position: absolute; top: 1vw; right: 9vw;"><img style="width: 20px;height: 20px;float: right;margin-right: 3vw;position:absolute;top: 2vw;right: 0vw;;" src="{FM_STATIC_MOBILE}public/images/back1.png" alt=""></div>
+				<div class="ly_school">{if empty($user['school'])}未填{else}{$user['school']}{/if}</div>
+				<div class="row">
+					<div class="col-xs-6 col-sm-6 lyy"><span>民族：{$user['nation']}</span></div>
+					<div class="col-xs-6 col-sm-6 ly"><span>ID:{$user['id']}</span></div>
+					<div class="col-xs-6 col-sm-6 lyy"><span>星座：{$user['constellation']}</span></div>
+					<div class="col-xs-6 col-sm-6 ly"><span>年龄:{$user['age']}</span></div>
+					<div class="col-xs-12 col-sm-12 lyy"><span>出生日期：{php echo date('Y-m-d',$user['birth'])}</span></div>
+					<div class="col-xs-6 col-sm-6 lyy"><span>身高：{if !empty($user['stature'])}{$user['stature']}cm{else}未填{/if}</span></div>
+					<div class="col-xs-6 col-sm-6 ly"><span>体重:{if !empty($user['weight'])}{$user['weight']}kg{else}未填{/if}</span></div>
+					<div class="col-xs-12 col-sm-12 lyy"><span>爱好：{if !empty($user['interest'])}{$user['interest']}{else}未填{/if}</span></div>
+					<div class="col-xs-12 col-sm-12 lyy"><span>个人签名：{$user['signature']}</span></div>		
+				</div>
+			</div> 
+		</div>
+		<div class="ly_lwlist">
+			<div style="text-align: center;padding: 1vw">
+				<div style="width: 100%;text-align: center;">赠送礼物</div>
+				<img id="ly_back"  style="width: 20px;height: 20px;float: right;margin-right: 3vw;position:absolute;top: 2vw;right: 0vw;;" src="{FM_STATIC_MOBILE}public/images/fh.png" alt="">
+			</div>
+			<div class="ly_lw_dis row">
+				{loop $gift_list $val}
+				<div class="ly_lww col-xs-3 col-sm-3" style="padding:0" data-id="{$val['id']}">
+					<div style="margin-top: 2.5vw">
+						<img style="width: 9vw;height: 9vw;" src="{php echo tomedia($val['images'])}" alt="">
+					</div>
+					<div style="margin-top: 2.5vw;font-size: 0.8em">
+						<span style="color: red">+{$val['piaoshu']}票</span>
+					</div>
+				</div>
+				{/loop}
+			</div>
+			<div style="text-align: center;padding-top: 2vw">点击礼物支付后，即时送出</div>
+		</div>
+		<div class="con_tm">
+			<div id="tangmu">
+
+			</div>
+		</div>
+		<div class="int" id="int">
+			<input type="text" id="int_txt" class="int_txt" />
+			<input type="button" class="int_btn" id="int_btn" value="发射" />
+		</div>
+		<div class="hua"><i></i><i></i><i></i> 左右滑动 <i></i><i></i><i></i></div>
+		{template 'tvote'}
+		<script type="text/javascript">
+			$('#all_display').on('click',function(){
+				$('#ly_bottom').toggle()
+				$('.zongshu').toggle()
+				$('#display_info').toggle()
+				var path = $(this).attr('src');
+				if(path == "{FM_STATIC_MOBILE}public/images/hy.png"){
+					$(this).attr('src',"{FM_STATIC_MOBILE}public/images/qp.png")
+				}else{
+					$(this).attr('src',"{FM_STATIC_MOBILE}public/images/hy.png")
+				}
+			})
+			var iscode = "{$rvote['iscode']}";
+	//$('#atten_shade').live('click', function() {
+	 //	$('#atten_shade').remove();
+	//})
+	document.ontouchstart = function(){
+		$('.hua').fadeOut(0)
+	}
+	//跳转礼物页面
+	$('.ly_lww').on('click',function(){
+		var giftid = $(this).data('id')
+		window.location.href = "{php echo $this->createMobileUrl('giftvote',array('tfrom_user'=>$tfrom_user,'rid'=>$rid))}&gid="+giftid
+	})
+
+	$('#text').blur(function(){
+		$('.swipe').css('top','0px')
+		$('.swipe li').css('top','0px')
+	})
+	$('#tanmu').bind('click',function(){
+		$('.add,.addl').find('i img').removeClass('changesize')	;
+		$('.add,.addl').find('span').removeClass('jiayi')	;
+		if($(int).is(':hidden')){
+			$('.tanmu').css({background : '#ef1e6f',padding:'0 0 0 5px'}).children('.yuan').css('float','right');
+			$('.lapiao').hide();
+			$('.int').show();
+			tanmuAjax();
+		}else{
+			$('.tanmu').css({background : '#979797',padding:'0'}).children('.yuan').css('float','left');
+			$('.lapiao').show();
+			$('.int').hide();
+			$('.floatTxt').remove();
+			clearInterval(TIMER);
+			//clearInterval(TIMER2);
+		}
+	});
+	$('#display_info').bind('click',function(event) {
+		/* Act on the event */
+		$('.ly_lwlist').css('display','none')
+		var dis = $('.ly_info')
+		dis.slideToggle(500, function() {
+		});
+	});
+	$('#info_hide').bind('click',function(){
+		var dis = $('.ly_info')
+		dis.slideToggle(500, function() {
+		});
+	})
+	$('#ly_lw').bind('click',function(){
+		$('.ly_info').css('display','none')
+		var dis = $('.ly_lwlist')
+		dis.slideToggle(500, function() {
+		});
+	})
+	$('#ly_back').bind('click',function(){
+		$('.ly_lwlist').css('display','none')
+	})
+	function tanmuAjax(){
+		$.ajax({ 
+			type:'post',
+			url:'{php echo $this->createMobileUrl('tbbs')}',
+			data:{rid:"{$rid}",tfrom_user:"{$tfrom_user}",from_user:"{$from_user}",msgstr:$(".txte").val()},
+			success:function(data){
+				if(data!=''){
+					var data = eval('('+data+')');
+
+					var i=0;
+					function tanmuStart(data){
+						createDiv(data[i]);
+						i++;
+						if(i==data.length){
+							clearInterval(TIMER);
+							TIMER2 = setTimeout('tanmuAjax()',2000)
+						}
+					}
+					if(data.length<=10){
+						tanmuStart(data)
+						TIMER = setInterval(function(){
+							tanmuStart(data)
+						},5000)
+					}else{
+						tanmuStart(data)
+						TIMER = setInterval(function(){
+							tanmuStart(data)
+						},300)
+					}
+				}
+			}
+		})
+	}
+
+
+	var magazine_id = '{$user['uid']}';
+	function randomString(len) {
+		　　len = len || 32;
+		　　var $chars = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678';    /****默认去掉了容易混淆的字符oOLl,9gq,Vv,Uu,I1****/
+		　　var maxPos = $chars.length;
+		　　var pwd = '';
+		　　for (i = 0; i < len; i++) {
+			　　　　pwd += $chars.charAt(Math.floor(Math.random() * maxPos));
+		　　}
+		　　return pwd;
+	}
+	//设置cookie
+	function setCookie(name,value,time)
+	{
+		var strsec = time*1000; // 毫秒
+		var exp = new Date();
+		exp.setTime(exp.getTime() + strsec);
+		document.cookie = name + "="+ escape (value) + ";expires=" + exp.toGMTString();
+	}
+	//读取cookies
+	function getCookie(name)
+	{
+		var arr,reg=new RegExp("(^| )"+name+"=([^;]*)(;|$)");
+
+		if(arr=document.cookie.match(reg))
+
+			return (arr[2]);
+		else
+			return null;
+	}
+	function getFmoonsId() {
+		var magazine_fmoons_id = getCookie('magazine_fmoons_id'+magazine_id);
+		if(!magazine_fmoons_id) {
+			magazine_fmoons_id = randomString(32);
+			setCookie('magazine_fmoons_id'+magazine_id, magazine_fmoons_id, 86400*100);
+		}
+		return magazine_fmoons_id;
+	}
+
+	function convertBizUrl() {
+		if(ary_biz_jump_id.length > 0) {
+
+
+			var pid = '{$user['uid']}';
+			var fmoons_id = getFmoonsId();
+			var i = 0;
+			for(i; i<ary_biz_jump_id.length;i++) {
+				var url = ary_biz_jump_url[i];
+				//判断是否是老活动逻辑
+				if(-1 == url.indexOf('Webexam') && (-1 == url.indexOf('BigWeel'))) {
+					break;
+				}
+
+				if(-1 != url.indexOf('BigWeel') && pid == '{$user['uid']}') {
+					var new_url = url.replace('fromUsername', fmoons_id);
+					document.getElementById(ary_biz_jump_id[i]).href = new_url;
+				}
+
+				if(-1 != url.indexOf('Webexam')) {
+					var new_url = url.replace('fromUsername', fmoons_id);
+					document.getElementById(ary_biz_jump_id[i]).href = new_url;
+				}
+			}
+		}
+
+	}
+
+	//弹幕
+	function addEvent(obj,sEv,fn){
+		if(obj.addEventListener){
+			obj.addEventListener(sEv,fn,false);
+		}else{
+			obj.attachEvent('on'+sEv,fn);
+		}
+	}
+	$(document).delegate('#int_btn','click',function(){
+		var $txt = $('#int_txt');
+
+		var content = $txt.val();
+		if(content == '' || content == null) {
+			fmloadding('.overlay_container', '请输入内容！');
+			return false;
+		}
+
+		var bbstype = "tuserphotos";
+		var $bbslast = bbsreply(content, iscode, bbstype);
+		if ($bbslast == true) {
+			createDiv($txt.val());
+			$txt.val('');
+			$('#int_txt').val('');
+			setInterval(function(){
+				$('.floatTxt').each(function(){
+					if(parseInt($(this).css('left'))<=-320){
+						$(this).remove();
+					}
+				})
+			},5000)
+		}
+	})
+	function createDiv(txt){
+		var oDiv = document.createElement('div');
+		oDiv.className = 'floatTxt';
+		oDiv.innerHTML = txt;
+		$('body').append(oDiv);
+		var h = $('.container').height();
+		$(oDiv).css({'left':'-320px','color':'rgb('+rnd(0,255)+','+rnd(0,255)+','+rnd(0,255)+')','top':rnd(0,h-100)+'px','fontSize':rnd(12,23)+'px'});
+		oDiv.addEventListener('touchstart',function(event){
+			event.preventDefault();
+			return false;
+		})
+		oDiv.addEventListener('touchmove',function(event){
+			event.preventDefault();
+			return false;
+		})
+		oDiv.addEventListener('touchend',function(event){
+			event.preventDefault();
+			return false;
+		})
+	}
+	function rnd(n,m){ //随机数字
+		return parseInt(Math.random()*(m-n+1))+n
+	}
+	var vote = {
+		iNow:0,
+		arr:[],
+		fontHtml:'',
+		oId:''	,
+		oName:''
+	}
+
+</script>
+
+
+{template 'footer'}
+　

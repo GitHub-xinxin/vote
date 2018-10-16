@@ -1,0 +1,169 @@
+{template 'common/header'}
+{if $rid!=''}
+{template 'web/nav'}
+{/if}
+<style>
+th,td{
+  text-align: center;
+}
+.bg{
+  background-color: #c2c2c2 !important;
+  border-style: none;
+}
+</style>
+<ul class="nav nav-tabs">
+
+  <li {if $operation == 'list'}class="active"{/if}><a href="{php echo $this->createWebUrl('ly_school',array('op'=>'list','rid'=>$rid))}">学校列表</a></li>
+  <li {if $operation == 'add'}class="active"{/if}><a href="{php echo $this->createWebUrl('ly_school',array('op'=>'add','rid'=>$rid))}">
+   {if empty($_GPC['id'])}添加学校 {else}编辑学校{/if}
+ </a></li>
+</ul>
+{if $operation == 'add'}
+<form class="form-horizontal">
+	<div class="form-group">
+		<label for="firstname" class="col-sm-2 control-label">学校</label>
+		<div class="col-sm-8">
+			<input type="text" id="name" name="name" value="{$school['name']}" class="form-control">
+		</div>
+	</div>
+  <div class="form-group">
+    <label for="firstname" class="col-sm-2 control-label">所属赛区</label>
+    <div class="col-sm-8">
+      <select name="area" id="area" class="form-control">
+        {loop $area_list $value}
+        <option {if $value['id'] == $school['area']} selected="selected"{/if} value="{$value['id']}">{$value['name']}</option>
+        {/loop}
+      </select>
+    </div>
+    <div class="form-group">
+      <div class="col-sm-offset-2 col-sm-10">
+        <input type="hidden" id="id" name="id" value="{$school['id']}">
+      </div>
+    </div>
+  </form>
+  <div style="text-align: center;">
+    <span id="submit" class="btn btn-success">提交</span>
+  </div>
+  <div class="panel panel-info" style="width: 80%;margin-top: 2vw;margin-left: 10%">
+    <div class="panel-heading">
+      <span>选择赛区学校列表</span>
+    </div>
+    <div class="panel-body">
+     <div class="row" id="school_div">
+       {loop $schools $val}
+       <div class="col-md-3">
+        {$val['name']}
+      </div>
+      {/loop}
+    </div>
+  </div>
+</div>
+<script>
+  $(function(){
+    $('#submit').click(function(){
+      var name = $('#name').val()
+      var id = $('#id').val()
+      var area = $('#area').val()
+      $.post("{php echo $this->createWebUrl('ly_school')}", {name: name,id:id,oper:'check',rid:"{$rid}"}, function(data, textStatus, xhr) {
+        if(data.code){
+          alert('该学校已经存在')
+        }else{
+          $.post("{php echo $this->createWebUrl('ly_school')}", {name: name,oper:'add',rid:"{$rid}",area:area,id:id}, function(data, textStatus, xhr) {
+            if(data.code){
+              alert('录入失败')
+            }else{
+              alert('录入成功')
+              window.location.href="{php echo $this->createWebUrl('ly_school',array('rid'=>$rid))}"
+            }
+          },'json');
+        }
+      },'json');
+    })
+
+    $('#area').change(function(event) {
+      var sid = $(this).val()
+      $.post('{php echo $this->createWebUrl('ly_school')}', {rid: "{$rid}",oper:'school',sid:sid}, function(data, textStatus, xhr) {
+        $('#school_div').empty()
+        if(data.data.length){
+          $.each(data.data,function(index, el) {
+            $('#school_div').append($('<div class="col-md-3">'+el.name+'</div>'))
+          });
+        }
+      },'json');
+    });
+  })
+
+</script>
+{elseif $operation == 'list'}
+<div class="panel panel-info">
+  <div class="panel-heading">筛选</div>
+  <div class="panel-body">
+    <form action="" method="post" class="form-horizontal" role="form">
+      <div class="row">
+        <div class="col-md-4">
+          <input type="text" class="form-control" name="keyword" value="{$_GPC['keyword']}" placeholder="请输入搜索的学校名">
+        </div>
+        <div class="col-md-2">
+          <input type="hidden" name="token" value="{$_W['token']}">
+          <input type="submit" name="submit" class="btn btn-success" value="搜索">
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>id</th> 
+      <th>学校</th>
+      <th>所属赛区</th>
+      <th>操作</th>
+    </tr>
+  </thead>
+  <tbody>
+   {loop $school_list $index $val}
+   <tr>
+    <td>{php echo $index+1}</td>
+    <td>{$val['name']}</td>
+    <td>{$val['area']}</td>
+    <td>
+     <a class="btn btn-danger" onclick="return confirm('确定要删除吗？')" href="{php echo $this->createWebUrl('ly_school',array('op'=>'del','id'=>$val['id'],'rid'=>$rid))}">删除</a>
+     <a class="btn btn-info" href="{php echo $this->createWebUrl('ly_school',array('op'=>'add','id'=>$val['id'],'rid'=>$rid))}">修改</a>
+     <span class="btn btn-success is_display {if $val['is_display']==1}bg{/if}" data-id="{$val['id']}">{if $val['is_display'] == 0}开始报名{else}结束报名{/if}</span>
+     <span class="btn btn-success is_vote {if $val['isvote']==1}bg{/if}" data-id="{$val['id']}">{if $val['isvote'] == 0}开始投票{else}结束投票{/if}</span>
+   </td>
+ </tr>
+ {/loop}
+</tbody>
+</table>
+{$pager}
+<script type="text/javascript">
+  $(function(){
+    $('.is_display').click(function(){
+      var id = $(this).data('id')
+      var elem = $(this)
+      $.post("{php echo $this->createWebUrl('ly_school')}",{id:id},function(res){
+        if(res.code){
+          if(res.msg){
+            elem.text('结束报名').addClass('bg')
+          }else
+            elem.text('开始报名').removeClass('bg')
+        }
+      },'json')
+    })
+    $('.is_vote').click(function(){
+      var id = $(this).data('id')
+      var elem = $(this)
+      $.post("{php echo $this->createWebUrl('ly_school')}",{id:id,oper:'vote'},function(res){
+        if(res.code){
+          if(res.msg){
+            elem.text('结束投票').addClass('bg')
+          }else
+            elem.text('开始投票').removeClass('bg')
+        }
+      },'json')
+    })
+  })
+</script>
+{/if}
+{template 'common/footer'}

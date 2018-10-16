@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	<link href="{$_W['siteroot']}app/resource/css/bootstrap.min.css" rel="stylesheet">
+	<script src="{FM_STATIC_MOBILE}public/js/jquery-2.1.3.min.js"></script>
+	{php echo register_jssdk(false)}
+	<title>{$title_name}展示视频</title>
+
+	<style>
+	.ly_img{
+		width: 40px;
+		height: 40px;
+		border-radius: 50%;
+		float: left;
+	}
+	li{
+		clear:both;
+		margin: 4vw;
+		margin-left: 5vw;
+		list-style: none; 
+	}
+	li span{
+		font-size: 0.7em
+	}
+	.lapiao {
+		height: 12vw;
+		left: 0;
+		/* background: rgba(0,0,0,0.5);*/
+		position: fixed;
+		bottom: 0;
+		z-index: 10000;
+		max-width: 640px;
+		margin: 0 auto;
+		background-color: white;
+		width: 100%;
+	}
+	.row input,.ly_pl input{
+		background-color: rgba(34,34,35,0.7);
+		padding: 1vw 2vw;
+		font-family: 'Microsoft Yahei', 'Simsun';
+		font-size: 14px;
+		border:none;
+		line-height: 7vw;
+	}
+	.ly_pl{
+		margin-top: 2vw
+	}
+	.lou{
+		position: absolute;
+		top: 1vw;
+		left: -7vw;
+		font-size: 0.6em;
+	}
+	input::-webkit-input-placeholder {
+		/* placeholder颜色  */
+		color: rgba(200,200,200,1); !important;
+	}
+</style>
+</head>
+<body style="margin:0;margin-bottom: 15vw">
+	
+	{loop $videoarr $row}
+	<div class="licon" style="  text-align: center;  margin: 0 auto; ">
+		<video id="videocon" controls width="100%" style="object-fit: fill" height="220" poster="{php echo $this->getvideoimg($tfrom_user,$rid)}" webkit-playsinline>
+			<source src="{php echo tomedia($row['videopath'])}" type='video/mp4' />
+			<p class="vjs-no-js">你的浏览器不支持该视频</a></p>
+		</video>
+	</div>
+	{/loop}
+	<div style="height: 2vw;background-color: gainsboro"></div>
+	<div style="margin-left: 4vw;display: grid;grid-template-columns: 2fr 8fr;margin: 2vw;margin-left: 11vw;">
+		<img src="{php echo tomedia($user['avatar'])}" alt="" style="border-radius: 50%;height: 40px;width: 40px">
+		<div>
+			<p></p>
+			<span style="font-size: 0.8em;position: relative;top: -1vw;left: -3vw;">{$user['realname']}视频秀</span>
+		</div>
+	</div>
+	<div style="border-top: solid 2px gainsboro"></div>
+	<ul id="com_area">
+		{loop $comment_list $index $val}
+		{if $index < 20}
+		<li style="position: relative;">
+			<!-- <p class="lou">{php echo count($comment_list) - $index}楼</p> -->
+			<img class="ly_img" src="{php echo tomedia($val['avatar'])}" alt="">
+
+			<div><span style="padding-left: 1vw">&nbsp;{$val['nickname']}&nbsp;&nbsp;</span><span>&nbsp;{php echo date('Y-m-d H:i:s',$val['createtime'])}</span></div>
+			<span style="font-size: 0.6em">&nbsp;&nbsp;{$val['content']}</span>
+		</li>
+		{/if}
+		{/loop}
+		
+	</ul>
+	{if count($comment_list) > 20}
+	<div style="text-align: center;"><span id="more">显示更多..</span></div>
+	{/if}
+	<div class="lapiao">
+		<div style="height: 2vw;background-color: gainsboro"></div>
+		<div class="row">
+			<div class="col-xs-2 col-sm-2" id="back_vote"><img style="width: 27px;margin-top: 0.1em;margin-left: 2.5vw" src="{FM_STATIC_MOBILE}public/images/back2.png" alt=""></div>
+			<div  class="col-xs-8 col-sm-8" style="">
+				<form action="">
+					<input id="comment" style="width: 90%" type="text" placeholder="给Ta留言~">
+				</form>
+			</div>
+			<div  class="col-xs-2 col-sm-2" id="submit_com" style="padding: 0">
+				<input style="width: 70%;color: rgba(200,200,200,1);" type="text" value="评论">
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+	$(function(){
+		var num = 1
+		$('#submit_com').on('click',function(){
+			var val = $('#comment').val()
+			if(!val){
+				alert('请输入评论内容')
+				return false
+			}
+
+			var arrMg = "{$comment}".split('.')
+			console.log(arrMg);
+			  // 正则表达式
+			  // \d 匹配数字 
+
+			  for (var i = 0; i < arrMg.length; i++) {
+			    // 创建一个正则表达式
+			    var r = new RegExp(arrMg[i], "ig");
+			    val = val.replace(r, "*");
+			}
+
+			$.post("{php echo $this->createMobileUrl('user_vedio',array('tfrom_user'=>$tfrom_user,'rid'=>$rid))}", {comment: val}, function(data, textStatus, xhr) {
+				if(data){
+					alert('评论成功')
+					window.location.href="{php echo $this->createMobileUrl('user_vedio',array('tfrom_user'=>$tfrom_user,'rid'=>$rid))}"
+				}
+				else
+					alert('评论失败')
+			},'json');
+			return false
+		})
+		$('#more').on('click',function(){
+			$.post("{php echo $this->createMobileUrl('user_vedio',array('tfrom_user'=>$tfrom_user,'op'=>'more','rid'=>$rid))}", {num:num++}, function(data, textStatus, xhr) {
+				$.each(data,function(index, el) {
+					var item = '<li style="position: relative;">\
+					<img class="ly_img" src="'+el.avatar+'" alt="">\
+					<div><span style="padding-left: 1vw">&nbsp;'+el.nickname+'&nbsp;&nbsp;</span><span>&nbsp;'+el.createtime+'</span></div>\
+					<span style="font-size: 0.6em">&nbsp;&nbsp;'+el.content+'</span>\
+					</li>'
+					$('#com_area').append(item)
+				});
+				if(data.length < 20)
+					$('#more').hide()
+			},'json');
+		})
+		$('#back_vote').on('click',function(){
+			window.location.href = "{php echo $this->createMobileUrl('tuserphotos',array('rid'=>$rid,'tfrom_user'=>$tfrom_user))}"
+		})
+	})
+</script>
+{template 'footer'}

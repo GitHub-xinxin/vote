@@ -1,0 +1,47 @@
+{template 'common/header'}
+{if $rid!=''}
+{template 'web/nav'}
+{/if}
+<style>
+th,td{
+	text-align: center;
+}
+.bg{
+	background-color: #c2c2c2 !important;
+	border-style: none
+}
+</style>
+<div class="panel panel-info">
+	<div class="panel-heading">修改资料审核</div>
+	<div class="panel-body">
+		<table class="table table-striped">
+			<thead>
+				<tr>
+					<th>id</th>
+					<th>姓名</th>
+					<th>修改项目</th>
+					<th>修改为</th>
+					<th>申请时间</th>
+					<th>操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				{loop $modif_list $index $val}
+				<tr>
+					<td>{php echo $index+1}</td>
+					<td>{php echo $this->getrealname($val['from_user'],$rid)}</td>
+					<td>{php echo $this->getitem($val['item'])}</td>
+					<td>{php echo $this->getitem_value($val['item'],$val['value'])}</td>
+					<td>{php echo date('Y-m-d H:m:s',$val['insert_time'])}</td>
+					<td>
+						<a class="btn btn-danger" onclick="return confirm('确定要删除？')" href="{php echo $this->createWebUrl('ly_audit',array('op'=>'del','id'=>$val['id'],'rid'=>$rid))}">删除</a>
+						<a class="btn btn-success" href="{php echo $this->createWebUrl('ly_audit',array('op'=>'agree','id'=>$val['id'],'rid'=>$rid))}">通过</a>
+					</td>
+				</tr>
+				{/loop}
+			</tbody>
+		</table>
+		{$pager}
+	</div>
+</div>
+{template 'common/footer'}

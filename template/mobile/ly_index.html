@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<link rel="stylesheet" href="{FM_STATIC_MOBILE}public/css/tp.css">
+	<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+	<title>{$title_name}校园之星</title>
+	{php echo register_jssdk(false)}
+	<style type="text/css">
+	.kuang{
+		width: 100vw;
+		height: calc(1207/750*100vw);
+		background-image: url({FM_STATIC_MOBILE}public/images/1.png);
+		background-size: 100% 100%;
+		position: relative;
+	}
+	.bg{
+		width: 100%;
+		position: absolute;
+		top: -1vw;
+	}
+	.pa{
+		z-index: 3;
+	}
+	.wz{
+		width: 84%;
+		position: absolute;
+		top: 92vw;
+		left: 9vw;
+		z-index: 1;
+	}
+	a:link {color: blue; text-decoration:none;} //未访问：蓝色、无下划线 
+</style>
+</head>
+<body style="background-color: rgb(21,21,21);">
+	<div class="kuang">
+		<img class="logo pa" src="{FM_STATIC_MOBILE}public/images/logo.png?v=3.0"/>
+		<img class="ti pa" src="{FM_STATIC_MOBILE}public/images/ti.png"/>
+		<img class="bg" src="{FM_STATIC_MOBILE}public/images/stu_bg.png"/>
+		<p class="tit pa" style="font-size:1.5em">校园之星</p>
+		<img class="tu pa" src="{FM_STATIC_MOBILE}public/images/stu.png"/>
+		<img class="wz" src="{FM_STATIC_MOBILE}public/images/stu_new.png" alt="">
+		<div style="position: relative;">
+			<div class="bm pa">
+				{if empty($is_join)}
+				<a href="{php echo $this->createMobileUrl('ly_join', array('ly_bm' => '1', 'from_user' => $from_user, 'rid' => $rid))}"><p style="color: yellow">报名参赛</p></a>
+				{else}
+				<a href="{php echo $this->createMobileUrl('reg', array('tfrom_user' => $from_user, 'rid' => $rid))}"><p style="color: yellow">报名参赛</p></a>
+				{/if}
+			</div>
+		</div>
+		
+		<div class="tp pa" style="top: calc(896/750*100vw);width: calc(145/750*100vw);">
+			<a href="{php echo $this->createMobileUrl('ly_area', array('from_user' => $from_user, 'rid' => $rid))}"><p style="color: white;left: 5vw">赛区选择</p></a>
+		</div>
+		<div class="tp pa">
+			<a href="{php echo $this->createMobileUrl('photosvote', array('from_user' => $from_user, 'rid' => $rid))}"><p style="color: white">参与投票</p></a>
+		</div>
+		<div class="xz pa">
+			<a href="{php echo $this->createMobileUrl('ly_information', array('op'=>'read','from_user' => $from_user, 'rid' => $rid))}"><p style="color: white">参赛须知</p></a>
+		</div>
+		<div class="gr pa">
+			{if !empty($is_join)}
+			<a href="{php echo $this->createMobileUrl('reg', array('from_user' => $from_user, 'rid' => $rid))}"><p style="color: white">个人中心</p></a>
+			{else}
+			<a href="{php echo $this->createMobileUrl('ly_voter_center', array('from_user' => $from_user, 'rid' => $rid))}"><p style="color: white">个人中心</p></a>
+			{/if}
+		</div>
+	</div>
+	{template 'footer'}

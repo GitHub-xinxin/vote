@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	<script src="{FM_STATIC_MOBILE}public/js/jquery-2.1.3.min.js"></script>
+	<link rel="stylesheet" href="{FM_STATIC_MOBILE}public/js/swiper-4.3.5.min.css">
+	{php echo register_jssdk(false)}
+	<title>个人中心</title>
+	<style>
+	.avatar{
+		border-radius: 50%;
+		width: 91px;
+		border: solid 2px #c2c2c2;
+		margin-top: 6vw;
+		margin-left: 37%;
+	}
+	.nickname{
+		text-align: center;
+		color: #c2c2c2;
+		position: relative;
+		top: -3vw;
+	}
+	.bm span{
+		position: absolute;
+		right: 0;
+		background-color: yellow;
+		padding: 1vw;
+		padding-left: 2vw;
+		padding-right: 2vw;
+		width: 100;
+		font-size: 0.9em;
+	}
+	.bm{
+		position: relative;
+		top: -32vw
+	}
+	.info{
+		margin-left: 10vw;
+		color: #c2c2c2;
+		font-size: 0.75em;
+	}
+	.infoo{
+		height: 50vw;
+		width: 40vw;
+		background-color: white;
+	}
+	.infoo img{
+		width: 100%;
+		height: 39vw;
+	}
+	.info_num{
+		font-size: 0.75em;
+	}
+	.ty{
+		padding: 0.5vw;
+		background-color: #F46767;
+		float: right;
+		position: relative;
+		top: 0.5vw;
+		color: white
+	}
+	.id{
+		position: absolute;
+		background-color: #F46767;
+		color: white;
+	}
+}
+</style>
+</head>
+<body style="background-color: rgb(34,35,35)">
+	<div>
+		<div>
+			<img class="avatar" src="{php echo tomedia($avatar)}" alt="">
+		</div>
+		<div>
+			<p class="nickname">用户id:{$nickname}</p>
+		</div>
+	</div>
+	<div class="bm">
+		<a href="{php echo $this->createMobileUrl('reg', array('ly_bm' => '1', 'from_user' => $from_user, 'rid' => $rid))}"><span style="color:rgb(34,35,35)">报名参赛</span></a>
+	</div>
+	<div class="info">
+		<span>今日余票：{if empty($has)&& $has !=0}{$set_count}{else}{$has}{/if}票</span><br>
+		<div style="margin-top: 1vw"><span>总投票：{if !empty($count)}{$count}{else}0{/if}(含礼物)</span></div>
+		
+	</div>
+	<div class="info">
+		<p>最近投票列表</p>
+	</div>
+	<div class="swiper-container" style="margin-top: 8vw">
+		<div class="swiper-wrapper">
+			{loop $vote_info $val}
+			<div class="infoo swiper-slide" data-open = "{$val['from_user']}">
+				<span class="id">ID:{$val['id']}</span>
+				<img src="{php echo tomedia($val['pic'])}" alt="">
+				<div style="text-align: center;font-size: 0.75em"><span>{$val['realname']}</span></div>
+				<div class="info_num">
+					<span style="padding-left: 1vw">{$val['photosnum']}票</span>
+					<span class="ty">投一票</span>
+				</div>
+			</div>
+			{/loop}
+		</div>
+	</div>
+<script>
+	$(function(){
+		$('.infoo').on('click',function(){
+			var from_user = $(this).data('open')
+			window.location.href = "{php echo $this->createMobileUrl('tuserphotos',array('rid'=>$rid))}&tfrom_user="+from_user
+		})
+	})
+</script>
+<script src="{FM_STATIC_MOBILE}public/js/swiper-4.3.5.min.js"></script>
+<script language="javascript"> 
+	var mySwiper = new Swiper('.swiper-container',{
+		slidesPerView : 3,
+		spaceBetween:5
+	})
+</script>
+{template 'footer'}

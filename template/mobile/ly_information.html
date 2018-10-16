@@ -1,0 +1,58 @@
+{template 'common/header'}
+{php echo register_jssdk(false)}
+<style>
+.next{
+	text-align: center;
+	margin-top: 6vw;
+	margin-bottom: 8vw;
+}
+.content{
+	margin: 7vw;
+	margin-top: 7vw;
+	margin-bottom: 10vw;
+}
+.back{
+	width: 6vw;
+	margin-right: 12vw;
+	position: absolute;
+	right: 0;
+	top: -10vw
+}
+.back_text{
+	position: absolute;
+	top: -10vw;
+	right: 20vw;
+}
+</style>
+<body>
+	<div style="text-align: center;margin-top: 4vw">
+		<h4>参赛须知</h4>
+	</div>
+	<div class="content">
+		{php echo ihtml_entity_decode($content)}
+	</div>
+	<div style="position: relative;" onclick="javascript:history.back(-1);"> 
+		<div>
+			<span class="back_text">返回</span>
+			<img class="back" src="{FM_STATIC_MOBILE}public/images/back.png" alt="">
+		</div>
+		
+	</div>
+	{if $_GPC['op'] != 'read'}
+	<div class="next">
+		<button class="btn btn-success" onclick="next()">同&nbsp;&nbsp;&nbsp;意</button>
+	</div>
+	{/if}
+<script>
+	window.document.title="参赛须知"
+
+	function next(){
+		var url = "{php echo $this->createMobileUrl('ly_information', array('from_user' => $from_user, 'rid' => $rid))}"
+		$.post(url,{},function(res){
+			if(res)
+				window.location.href = "{php echo $this->createMobileUrl('reg', array('ly_bm' => '1', 'from_user' => $from_user, 'rid' => $rid))}"
+
+		},'json')
+	}
+</script>
+{template 'footer'}

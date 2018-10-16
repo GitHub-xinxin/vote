@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<link rel="stylesheet" href="{FM_STATIC_MOBILE}public/layui/css/layui.css">
+	
+	<link rel="stylesheet" href="{FM_STATIC_MOBILE}public/css/tp.css">
+	<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+	<title>赛区选择</title>
+	{php echo register_jssdk(false)}
+	<style type="text/css">
+	.kuang{
+		width: 100vw;
+		height: calc(1207/750*100vw);
+		background-image: url({FM_STATIC_MOBILE}public/images/1.png);
+		background-size: 100% 100%;
+		position: relative;
+	}
+	.bg{
+		width: 100%;
+		position: absolute;
+		top: -1vw;
+	}
+	.pa{
+		z-index: 3;
+	}
+	.wz{
+		width: 91%;
+		position: absolute;
+		top: 95vw;
+		left: 6vw;
+		z-index: 1;
+	}
+
+	.layui-form{
+		position: absolute;
+		top: 62vw;
+	}
+	.layui-form-select .layui-input{
+		color:#F46767;background: rgb(34,35,35);
+	}
+	a:link {color: blue; text-decoration:none;} //未访问：蓝色、无下划线 
+</style>
+</head>
+<body style="background-color: rgb(21,21,21);">
+	<div class="kuang">
+		<img class="logo pa" src="{FM_STATIC_MOBILE}public/images/logo.png?v=3.0"/>
+		<img class="ti pa" src="{FM_STATIC_MOBILE}public/images/ti.png"/>
+		<img class="bg" src="{FM_STATIC_MOBILE}public/images/stu_bg.png"/>
+		<p class="tit pa"  style="font-size:1.65em;padding-top: 6vw;">校园之星</p>
+		<form class="layui-form" action="" method="POST">
+			{if $rbasic['isschool_mode'] == 0}
+			<div class="layui-row" style="width: 100vw;text-align: center;">
+				<div class="layui-col-xs8 layui-col-sm8" style="padding-left: 10vw;">
+					<select name="area" lay-verify="area>
+						<option value="0">请选择赛区</option>
+						{loop $area $val}
+						<option {if $select_info['area'] == $val['id']} selected="selected" {/if} value="{$val['id']}">{$val['name']}</option>
+						{/loop}
+					</select>
+				</div>
+				<div class="layui-col-xs4 layui-col-sm4">
+					<input type="submit" name="submit" value="确定" class="layui-btn" style="background-color: #F46767;">
+				</div>
+			</div>
+			{elseif $rbasic['isschool_mode'] == 1}
+			<div class="layui-row" style="width: 100vw;text-align: center;">
+				<div class="layui-col-xs5 layui-col-sm5" style="padding-left: 4vw;">
+					<select name="area" lay-filter="area">
+						<option value="">请选择赛区</option>
+						{loop $area $val}
+							<option {if $select_info['area'] == $val['id']} selected="selected" {/if} value="{$val['id']}">{$val['name']}</option>
+						{/loop}
+					</select>
+				</div>
+				<div class="layui-col-xs5 layui-col-sm5" style="padding-left: 2vw;padding-right: 2vw;">
+					<select name="school" lay-filter="school" id="school">
+						{if empty($schools)}
+						<option value="0">请选择学校</option>
+						{else}
+							<option value="0">请选择学校</option>
+							{loop $schools $val}
+								<option {if $select_info['school'] == $val['id']} selected="selected" {/if} value="{$val['id']}">{$val['name']}</option>
+							{/loop}
+						{/if}
+					</select>
+				</div>
+				<div class="layui-col-xs2 layui-col-sm2">
+					<input type="submit" name="submit" value="确定" class="layui-btn" style="background-color: #F46767;padding: 0 14px;">
+				</div>
+			</div>
+			{/if}
+			<input type="hidden" name="token" value="{$_W['token']}">
+		</form>
+		<img class="tu pa" style="top: calc(550/750*100vw);" src="{FM_STATIC_MOBILE}public/images/stu.png"/>
+		<img class="wz" src="{FM_STATIC_MOBILE}public/images/stu_new.png" alt="">
+	</div>
+	<script src="{FM_STATIC_MOBILE}public/layui/layui.js"></script>
+	<script>
+
+		layui.use(['form','element'], function(){
+			var form = layui.form,
+			$ = layui.jquery
+
+			form.on('select(area)', function(data){
+				var area = data.value
+				$.post('{php echo $this->createMobileUrl("ly_area")}', {area: area,rid:"{$rid}"}, function(data, textStatus, xhr) {
+					console.log(data.data)
+					$('#school').empty()
+					if(data.data.length){
+						$.each(data.data,function(index, el) {
+							$('#school').append($('<option value="'+el.id+'">'+el.name+'</option>'))
+						});
+					}else{
+						$('#school').append($('<option value="">请选择学校</option>'))
+					}
+					form.render('select');
+				},'json');
+			});  
+		});
+	</script>
+	{template 'footer'}
