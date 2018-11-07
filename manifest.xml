@@ -32,7 +32,7 @@
 			<message type="location" />
 			<message type="qr" />
 		</handles>
-		<rule embed="true" />
+		<rule embed="true" /> 
 		<card embed="false" />
 		
 	</platform>
